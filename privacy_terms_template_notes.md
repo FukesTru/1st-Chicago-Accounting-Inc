@@ -41,7 +41,7 @@ Source: `/home/ubuntu/upload/PrivacyPolicyTemplate.pdf`
 - Phone: (708) 428-4980
 - Email: brad@1stchicagoaccounting.com
 - Website: https://www.1stchicagoaccounting.com/
-- Address: 17646 Crestview Ct
+- Address: 2522 Bluestone Bay Dr, New Lenox, IL 60451
 - Year: 2026
 
 Pending: read `TermsofServiceTemplate.pdf`, `App.tsx`, `Footer.tsx`, and `Contact.tsx`.

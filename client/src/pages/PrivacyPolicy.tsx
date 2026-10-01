@@ -232,7 +232,7 @@ export default function PrivacyPolicy() {
               </p>
               <div className="space-y-1 text-gray-700">
                 <p className="font-semibold">1st Chicago Accounting</p>
-                <p>17646 Crestview Ct., Orland Park, IL 60467</p>
+                <p>2522 Bluestone Bay Dr., New Lenox, IL 60451</p>
                 <p>Phone: <a href="tel:7084284980" className="text-blue-600 hover:underline">(708) 428-4980</a></p>
                 <p>Email: <a href="mailto:brad@1stchicagoaccounting.com" className="text-blue-600 hover:underline">brad@1stchicagoaccounting.com</a></p>
                 <p>Website: <a href="https://www.1stchicagoaccounting.com/" className="text-blue-600 hover:underline">https://www.1stchicagoaccounting.com/</a></p>

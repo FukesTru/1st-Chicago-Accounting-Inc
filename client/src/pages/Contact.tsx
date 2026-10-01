@@ -121,9 +121,9 @@ export default function Contact() {
                     <MapPin size={15} />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Orland Park Office</p>
-                    <p className="text-sm text-gray-700">17646 Crestview Ct.</p>
-                    <p className="text-sm text-gray-700">Orland Park, IL 60467</p>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">New Lenox Office</p>
+                    <p className="text-sm text-gray-700">2522 Bluestone Bay Dr.</p>
+                    <p className="text-sm text-gray-700">New Lenox, IL 60451</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">

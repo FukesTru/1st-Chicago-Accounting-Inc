@@ -109,8 +109,8 @@ export default function Footer() {
                 <div className="flex gap-2.5">
                   <MapPin size={14} className="shrink-0 mt-0.5" style={{ color: "oklch(0.66 0.16 218)" }} />
                   <div>
-                    <p className="text-sm font-medium text-white">Orland Park Office</p>
-                    <p className="text-sm text-white/60 mt-0.5">17646 Crestview Ct.<br />Orland Park, IL 60467</p>
+                    <p className="text-sm font-medium text-white">New Lenox Office</p>
+                    <p className="text-sm text-white/60 mt-0.5">2522 Bluestone Bay Dr.<br />New Lenox, IL 60451</p>
                   </div>
                 </div>
                 <div className="flex gap-2.5">
