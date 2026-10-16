@@ -39,6 +39,32 @@ export default function Contact() {
         </div>
       </section>
 
+      {/* Online Booking Calendar */}
+      <section id="schedule" className="py-20 md:py-24" style={{ backgroundColor: "oklch(0.97 0.008 80)" }}>
+        <div className="container">
+          <div className="max-w-2xl mx-auto text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Schedule a Consultation
+            </h2>
+            <p className="text-gray-500 text-sm">Pick a time that works for you and book directly on Brad's calendar.</p>
+          </div>
+          <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 overflow-hidden">
+            <iframe
+              src="https://go.oncehub.com/BradFilmanowicz"
+              style={{ width: "100%", height: "800px", border: "none" }}
+              title="Schedule a consultation with Brad Filmanowicz"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-center text-xs text-gray-500 mt-4">
+            Calendar not loading?{" "}
+            <a href="https://go.oncehub.com/BradFilmanowicz" target="_blank" rel="noopener noreferrer" className="font-medium text-[oklch(0.66_0.16_218)] hover:underline">
+              Open the booking page in a new tab
+            </a>
+          </p>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section className="py-20 md:py-24 bg-white">
         <div className="container">
@@ -46,9 +72,9 @@ export default function Contact() {
             {/* Form */}
             <div className="lg:col-span-3">
               <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Schedule a Consultation
+                Send Brad a Message
               </h2>
-              <p className="text-gray-500 text-sm mb-8">Fill out the form below and Brad will be in touch within one business day.</p>
+              <p className="text-gray-500 text-sm mb-8">Prefer not to book online? Fill out the form below and Brad will be in touch within one business day.</p>
 
               <iframe
                 src="https://api.leadconnectorhq.com/widget/form/ncooGQAgnji9RqUdJ9an"
