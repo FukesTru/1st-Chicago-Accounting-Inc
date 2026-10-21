@@ -160,6 +160,31 @@ export default function Contact() {
           </div>
         </div>
       </section>
+
+      {/* Booking Calendar */}
+      <section className="py-20 md:py-24" style={{ backgroundColor: "oklch(0.97 0.008 80)" }}>
+        <div className="container">
+          <div className="max-w-2xl mx-auto text-center mb-10">
+            <p className="section-label text-[oklch(0.66_0.16_218)] mb-3">Book Online</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Pick a Time on Brad's Calendar
+            </h2>
+            <div className="w-12 h-0.5 mb-5 mx-auto" style={{ backgroundColor: "oklch(0.66 0.16 218)" }} />
+            <p className="text-gray-600 leading-relaxed">
+              Prefer to book directly? Choose a time that works for you and Brad will meet with you at the scheduled time.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto bg-white rounded-xl overflow-hidden border border-gray-100">
+            <iframe
+              src="https://go.oncehub.com/BradFilmanowicz"
+              style={{ width: "100%", height: "800px", border: "none" }}
+              title="Book a meeting with Brad Filmanowicz"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
     </PageLayout>
   );
 }
