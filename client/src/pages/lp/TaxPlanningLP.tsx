@@ -2,6 +2,7 @@
  * Google Ads landing page — C1 Tax Planning & Business Tax.
  * /lp/tax-planning          → tax planning ad group
  * /lp/tax-planning?v=prep   → business tax preparation ad group
+ * /lp/tax-planning?v=cpa    → local CPA ad group ("cpa near me", "cpa chicago")
  */
 import LandingPageTemplate from "@/components/LandingPageTemplate";
 
@@ -21,6 +22,12 @@ export default function TaxPlanningLP() {
           headline: "Business Tax Returns Prepared by a CPA, with a Plan to Owe Less Next Year",
           subhead:
             "S corp, LLC and corporate returns prepared by Brad Filmanowicz, CPA, MBA, EA, alongside your personal return. Start with a free consultation.",
+        },
+        cpa: {
+          eyebrow: "CPA for small business owners",
+          headline: "A Chicago-Area CPA Who Plans Ahead, So You Pay Less Tax",
+          subhead:
+            "Tax planning, business tax returns and monthly accounting from Brad Filmanowicz, CPA, MBA, EA. Start with a free consultation on Zoom.",
         },
       }}
       heroBullets={[
