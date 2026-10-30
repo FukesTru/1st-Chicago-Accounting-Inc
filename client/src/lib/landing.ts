@@ -3,8 +3,11 @@
  * Anything marked BLANK is waiting on Brad; the pages work without it.
  */
 
-export const PHONE_DISPLAY = "708-428-4980";
-export const PHONE_TEL = "7084284980";
+// GoHighLevel tracking number (bought 2026-10-30), forwards to Brad's office line 708-428-4980.
+// Google Ads swaps this for a forwarding number on ad visits, so the text must match the
+// "SS Calls From Website" conversion action exactly.
+export const PHONE_DISPLAY = "708-249-3300";
+export const PHONE_TEL = "7082493300";
 
 export const BOOKING_URL = "https://go.oncehub.com/BradFilmanowicz";
 
