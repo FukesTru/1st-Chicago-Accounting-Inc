@@ -11,10 +11,10 @@ export const PHONE_TEL = "7082493300";
 
 export const BOOKING_URL = "https://go.oncehub.com/BradFilmanowicz";
 
-// GoHighLevel form shown on the landing pages. Currently the existing website form.
-// Swap in the new qualifying form's ID once it's built in GHL (its "on submit" must redirect to /thank-you).
-export const LP_FORM_ID = "ncooGQAgnji9RqUdJ9an";
-export const LP_FORM_NAME = "Website Form (Brad Chicago Accounting)";
+// GoHighLevel form shown on the landing pages: "1CA - Google Ads Consult Form" (built 2026-10-30).
+// Its "on submit" action must stay "Open URL → /thank-you", which is what fires the Form Lead conversion.
+export const LP_FORM_ID = "RNgoSrJ6igd3foEo7tVh";
+export const LP_FORM_NAME = "1CA - Google Ads Consult Form";
 
 // Shown as "City, ST" only until Brad confirms whether 2522 Bluestone Bay Dr is an office or his home.
 export const SERVICE_AREA = "New Lenox, IL · Serving the Chicago area and remote clients on Zoom";
