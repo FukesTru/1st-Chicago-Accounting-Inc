@@ -4,7 +4,7 @@
  *            → Book online → Reviews carousel → (optional free course) → FAQ → Final CTA.
  * Headline variants are picked with ?v=<key> so one page can match several ad groups.
  */
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, BookOpen, CheckCircle2, Phone, ShieldCheck, Star } from "lucide-react";
 import LandingLayout, { PhoneLink } from "./LandingLayout";
 import Reveal from "./Reveal";
@@ -112,6 +112,41 @@ export default function LandingPageTemplate(props: LandingPageProps) {
   useEffect(() => {
     trackEvent("lp_view", { lp_variant: key });
   }, [key]);
+
+  // Always open at the top. Embedded widgets can grab focus while loading and drag the page
+  // down to themselves, so pin the scroll position for the first moments after load.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    if (window.location.hash) return;
+    window.scrollTo(0, 0);
+    let userScrolled = false;
+    const onWheel = () => { userScrolled = true; };
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchmove", onWheel, { passive: true });
+    const timers = [250, 800, 1600, 2600].map((ms) =>
+      window.setTimeout(() => { if (!userScrolled) window.scrollTo(0, 0); }, ms),
+    );
+    return () => {
+      timers.forEach(clearTimeout);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchmove", onWheel);
+    };
+  }, []);
+
+  // Mount the booking calendar only when the visitor gets near it, so it can't steal focus on load.
+  const bookRef = useRef<HTMLElement>(null);
+  const [showBooking, setShowBooking] = useState(false);
+  useEffect(() => {
+    const el = bookRef.current;
+    if (!el || showBooking) return;
+    if (!("IntersectionObserver" in window)) { setShowBooking(true); return; }
+    const io = new IntersectionObserver(
+      (entries) => { if (entries.some((e) => e.isIntersecting)) { setShowBooking(true); io.disconnect(); } },
+      { rootMargin: "600px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [showBooking]);
 
   return (
     <LandingLayout pageTitle={props.pageTitle}>
@@ -326,7 +361,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
       </section>
 
       {/* ── 6. BOOK ONLINE ── */}
-      <section id="book" className="py-16 md:py-24 scroll-mt-4" style={{ backgroundColor: CREAM }}>
+      <section id="book" ref={bookRef} className="py-16 md:py-24 scroll-mt-4" style={{ backgroundColor: CREAM }}>
         <div className="container">
           <Reveal>
             <SectionHeader
@@ -337,12 +372,15 @@ export default function LandingPageTemplate(props: LandingPageProps) {
           </Reveal>
           <Reveal>
             <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-              <iframe
-                src={BOOKING_URL}
-                style={{ width: "100%", height: "760px", border: "none" }}
-                title="Schedule a consultation with Brad Filmanowicz"
-                loading="lazy"
-              />
+              {showBooking ? (
+                <iframe
+                  src={BOOKING_URL}
+                  style={{ width: "100%", height: "760px", border: "none" }}
+                  title="Schedule a consultation with Brad Filmanowicz"
+                />
+              ) : (
+                <div style={{ height: "760px" }} aria-hidden="true" />
+              )}
             </div>
             <p className="text-center text-sm text-gray-500 mt-4">
               Calendar not loading?{" "}
