@@ -113,24 +113,16 @@ export default function LandingPageTemplate(props: LandingPageProps) {
     trackEvent("lp_view", { lp_variant: key });
   }, [key]);
 
-  // Always open at the top. Embedded widgets can grab focus while loading and drag the page
-  // down to themselves, so pin the scroll position for the first moments after load.
+  // Always open at the top, once, instantly. (The calendar embed below is lazy-mounted so it
+  // can no longer grab focus during load and drag the page down to itself.)
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
     if (window.location.hash) return;
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
     window.scrollTo(0, 0);
-    let userScrolled = false;
-    const onWheel = () => { userScrolled = true; };
-    window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("touchmove", onWheel, { passive: true });
-    const timers = [250, 800, 1600, 2600].map((ms) =>
-      window.setTimeout(() => { if (!userScrolled) window.scrollTo(0, 0); }, ms),
-    );
-    return () => {
-      timers.forEach(clearTimeout);
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchmove", onWheel);
-    };
+    html.style.scrollBehavior = prev;
   }, []);
 
   // Mount the booking calendar only when the visitor gets near it, so it can't steal focus on load.
