@@ -187,7 +187,14 @@ export default function PrivacyPolicy() {
                 <li>Remember your preferences</li>
                 <li>Improve website functionality and user experience</li>
                 <li>Measure the effectiveness of our services</li>
+                <li>Measure the effectiveness of our advertising</li>
               </ul>
+              <p className="mb-4">
+                We use Google services, including Google Ads, Google Analytics and Google Tag Manager, which may set cookies or use similar technologies to measure ad clicks, form submissions, calls and bookings that come from our ads. Calls placed from our ads or ad landing pages may be routed through a Google forwarding number so we can see that the call came from an ad. You can learn how Google uses this information at{" "}
+                <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="underline">policies.google.com/technologies/partner-sites</a>{" "}
+                and manage ad personalization at{" "}
+                <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="underline">adssettings.google.com</a>.
+              </p>
               <p>
                 You may control cookies through your browser settings. Disabling cookies may limit your ability to use certain features of our website.
               </p>

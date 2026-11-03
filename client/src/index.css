@@ -278,3 +278,67 @@
     }
   }
 }
+
+/* ── Google Ads landing pages: intro curtain + scroll reveals ───────────────── */
+.lp-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 62%, oklch(0.66 0.16 218 / 0.22), transparent 60%),
+    oklch(0.18 0.06 250);
+  will-change: transform;
+}
+.lp-curtain__logo {
+  width: min(250px, 56vw);
+  height: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0;
+  animation: lp-logo-rise 650ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.lp-curtain--lift {
+  animation: lp-curtain-lift 700ms cubic-bezier(0.7, 0, 0.25, 1) forwards;
+}
+.lp-curtain--lift .lp-curtain__logo {
+  animation: lp-logo-out 380ms ease-in forwards;
+}
+@keyframes lp-logo-rise {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes lp-logo-out {
+  to { opacity: 0; transform: translateY(-24px); }
+}
+@keyframes lp-curtain-lift {
+  to { transform: translateY(-100%); }
+}
+
+.lp-js .lp-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lp-js .lp-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-curtain { display: none; }
+  .lp-js .lp-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Reviews carousel: new page of cards fades up on change */
+.lp-review-track {
+  animation: lp-review-in 0.45s ease both;
+}
+@keyframes lp-review-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-review-track { animation: none; }
+}

@@ -21,6 +21,11 @@ import Bookkeeping from "./pages/Bookkeeping";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 
+// Google Ads landing pages (noindex, no main nav)
+import TaxPlanningLP from "./pages/lp/TaxPlanningLP";
+import MonthlyAccountingLP from "./pages/lp/MonthlyAccountingLP";
+import { ThankYou, Booked } from "./pages/lp/ThankYou";
+
 // Location / SEO pages — 8 approved cities
 import Chicago from "./pages/locations/Chicago";
 import OrlandPark from "./pages/locations/OrlandPark";
@@ -66,6 +71,12 @@ function Router() {
         <Route path="/locations/palos-park" component={PalosPark} />
         <Route path="/locations/homer-glen" component={HomerGlen} />
         <Route path="/locations/mokena" component={Mokena} />
+
+        {/* Google Ads landing pages */}
+        <Route path="/lp/tax-planning" component={TaxPlanningLP} />
+        <Route path="/lp/monthly-accounting" component={MonthlyAccountingLP} />
+        <Route path="/thank-you" component={ThankYou} />
+        <Route path="/booked" component={Booked} />
 
         {/* Legal pages */}
         <Route path="/privacy-policy" component={PrivacyPolicy} />
