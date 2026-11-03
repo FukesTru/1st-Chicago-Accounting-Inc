@@ -29,7 +29,7 @@ function ConfirmationPage({ kind }: { kind: "lead" | "booked" }) {
           <p className="text-lg text-gray-600 leading-relaxed mb-10">
             {booked
               ? "You'll get a confirmation email with the Zoom details. Brad looks forward to speaking with you."
-              : "Brad will be in touch within one business day, usually by email. Want to skip the back-and-forth? Pick a time on his calendar now."}
+              : "Brad will be in touch, usually by email. Want to skip the back-and-forth? Pick a time on his calendar now."}
           </p>
 
           {!booked && (

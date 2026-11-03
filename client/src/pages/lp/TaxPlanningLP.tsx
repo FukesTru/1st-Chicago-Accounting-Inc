@@ -41,7 +41,7 @@ export default function TaxPlanningLP() {
         {
           title: "The right entity structure",
           description:
-            "Brad checks whether a sole proprietorship, LLC, S corp or C corp fits your income today, and what switching would save.",
+            "Brad checks whether a sole proprietorship, LLC, S corp or C corp fits your income today, and whether switching makes sense.",
         },
         {
           title: "Year-end moves before the deadline",
@@ -77,7 +77,7 @@ export default function TaxPlanningLP() {
         {
           title: "Brad reviews your numbers",
           description:
-            "On a Zoom call, Brad looks at last year's return and this year's numbers and points out where you may be overpaying.",
+            "On a Zoom call, Brad looks at last year's return and this year's numbers and walks through which strategies still apply before year-end.",
         },
         {
           title: "Get a plan you can act on",
@@ -107,11 +107,11 @@ export default function TaxPlanningLP() {
         },
         {
           q: "What's the difference between tax planning and tax preparation?",
-          a: "Preparation reports what already happened. Planning changes what happens, by making decisions before the year ends so you owe less.",
+          a: "Preparation reports what already happened. Planning changes what happens, by making decisions before the year ends instead of reporting them after.",
         },
       ]}
-      finalHeadline="Ready to stop overpaying in taxes?"
-      finalSubtext="Book a free consultation with Brad Filmanowicz, CPA, MBA, EA and find out what a plan could save you."
+      finalHeadline="Ready to plan ahead instead of just filing?"
+      finalSubtext="Book a free consultation with Brad Filmanowicz, CPA, MBA, EA and find out which strategies fit your business."
     />
   );
 }

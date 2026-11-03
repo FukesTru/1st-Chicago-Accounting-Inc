@@ -124,7 +124,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
               />
               <div>
                 <p className="text-white font-semibold">Brad Filmanowicz, CPA, MBA, EA</p>
-                <p className="text-white/60 text-sm">You meet with Brad himself, not a junior associate.</p>
+                <p className="text-white/60 text-sm">You meet with Brad himself.</p>
                 {GOOGLE_RATING && (
                   <p className="flex items-center gap-1 text-sm text-white/80 mt-1">
                     <Star size={14} fill="currentColor" className="text-amber-400" />
@@ -138,7 +138,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
           <div id="get-started" className="lg:col-span-5 scroll-mt-4">
             <div className="bg-white rounded-xl shadow-xl p-5 md:p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-1" style={serif}>Book your free consultation</h2>
-              <p className="text-sm text-gray-500 mb-4">Tell us a little about your business. Brad will be in touch within one business day.</p>
+              <p className="text-sm text-gray-500 mb-4">Tell us a little about your business and Brad will be in touch.</p>
               <iframe
                 src={`https://api.leadconnectorhq.com/widget/form/${LP_FORM_ID}`}
                 style={{ width: "100%", height: "620px", border: "none", borderRadius: "8px" }}
