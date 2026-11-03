@@ -19,7 +19,7 @@ function ConfirmationPage({ kind }: { kind: "lead" | "booked" }) {
   const booked = kind === "booked";
 
   return (
-    <LandingLayout pageTitle={booked ? "Consultation Booked | 1st Chicago Accounting" : "Thank You | 1st Chicago Accounting"} hideMobileBar>
+    <LandingLayout pageTitle={booked ? "Consultation Booked | 1st Chicago Accounting" : "Thank You | 1st Chicago Accounting"} hideMobileBar intro={false}>
       <section className="py-16 md:py-24">
         <div className="container max-w-2xl text-center">
           <CheckCircle2 size={56} className="mx-auto mb-6" style={{ color: CYAN }} />

@@ -5,6 +5,7 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
 import { Phone, CalendarCheck } from "lucide-react";
+import IntroCurtain from "./IntroCurtain";
 import { PHONE_DISPLAY, PHONE_TEL, SERVICE_AREA, setNoIndex, trackEvent } from "@/lib/landing";
 
 interface LandingLayoutProps {
@@ -12,6 +13,8 @@ interface LandingLayoutProps {
   pageTitle: string;
   /** Hide the sticky mobile bar (e.g. on the thank-you page). */
   hideMobileBar?: boolean;
+  /** Play the one-time navy intro curtain (off on confirmation pages). */
+  intro?: boolean;
 }
 
 export function PhoneLink({ className, label, location }: { className?: string; label?: string; location: string }) {
@@ -26,11 +29,12 @@ export function PhoneLink({ className, label, location }: { className?: string; 
   );
 }
 
-export default function LandingLayout({ children, pageTitle, hideMobileBar }: LandingLayoutProps) {
+export default function LandingLayout({ children, pageTitle, hideMobileBar, intro = true }: LandingLayoutProps) {
   useEffect(() => setNoIndex(pageTitle), [pageTitle]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      {intro && <IntroCurtain />}
       <header className="bg-white border-b border-gray-100">
         <div className="container">
           <div className="flex items-center justify-between h-16 md:h-20">

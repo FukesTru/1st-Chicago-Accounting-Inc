@@ -13,13 +13,13 @@ export default function MonthlyAccountingLP() {
       variants={{
         default: {
           eyebrow: "Monthly accounting for small businesses",
-          headline: "A CPA Who Keeps Your Books Right Every Month, Not Just at Tax Time",
+          headline: "Keep Your Books Right Every Month, Not Just at Tax Time",
           subhead:
             "Monthly accounting, bookkeeping and reporting from Brad Filmanowicz, CPA, MBA, EA, so you always know where your business stands. Start with a free consultation.",
         },
         bookkeeping: {
           eyebrow: "Bookkeeping services",
-          headline: "Behind on Your Books? Get Caught Up, Then Stay Current Every Month",
+          headline: "Behind on Your Books? We'll Catch You Up, Then Keep You Current Every Month",
           subhead:
             "Bookkeeping, cleanup and monthly reconciliation by a CPA and QuickBooks ProAdvisor. Start with a free consultation with Brad Filmanowicz, CPA, MBA, EA.",
         },

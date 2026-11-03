@@ -13,19 +13,19 @@ export default function TaxPlanningLP() {
       variants={{
         default: {
           eyebrow: "Tax planning for business owners",
-          headline: "Pay Less Tax This Year, Legally, with a Plan Built Before December 31",
+          headline: "Walk Into Tax Season With a Plan, Not a Guess.",
           subhead:
-            "Proactive tax planning from Brad Filmanowicz, CPA, MBA, EA. Start with a free consultation on Zoom and see where your business may be overpaying.",
+            "Proactive tax planning from Brad Filmanowicz, CPA, MBA, EA. Start with a free consultation on Zoom and see which year-end strategies apply to your business.",
         },
         prep: {
           eyebrow: "Business tax preparation",
-          headline: "Business Tax Returns Prepared by a CPA, with a Plan to Owe Less Next Year",
+          headline: "File Your Business Return the Right Way, Then Plan Ahead for Next Year",
           subhead:
             "S corp, LLC and corporate returns prepared by Brad Filmanowicz, CPA, MBA, EA, alongside your personal return. Start with a free consultation.",
         },
         cpa: {
           eyebrow: "CPA for small business owners",
-          headline: "A Chicago-Area CPA Who Plans Ahead, So You Pay Less Tax",
+          headline: "A Chicago CPA Who Plans Ahead, Not One Who Just Files",
           subhead:
             "Tax planning, business tax returns and monthly accounting from Brad Filmanowicz, CPA, MBA, EA. Start with a free consultation on Zoom.",
         },
