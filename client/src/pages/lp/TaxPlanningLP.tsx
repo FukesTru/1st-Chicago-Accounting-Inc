@@ -13,21 +13,21 @@ export default function TaxPlanningLP() {
       variants={{
         default: {
           eyebrow: "Tax planning for business owners",
-          headline: "Walk Into Tax Season With a Plan, Not a Guess.",
+          headline: "Give Me 15 Minutes. I'll Show You Where $30,000 Is Hiding.",
           subhead:
-            "Proactive tax planning from Brad Filmanowicz, CPA, MBA, EA. Start with a free consultation on Zoom and see which year-end strategies apply to your business.",
+            "Brad's tax planning clients typically save $35,000 in the first year, some as much as $200,000. If your plan doesn't return 3-to-1 on what it costs, it's free.",
         },
         prep: {
           eyebrow: "Business tax preparation",
           headline: "File Your Business Return the Right Way, Then Plan Ahead for Next Year",
           subhead:
-            "S corp, LLC and corporate returns prepared by Brad Filmanowicz, CPA, MBA, EA, alongside your personal return. Start with a free consultation.",
+            "Brad's tax planning clients typically save $35,000 in the first year, some as much as $200,000. If your plan doesn't return 3-to-1 on what it costs, it's free.",
         },
         cpa: {
           eyebrow: "CPA for small business owners",
           headline: "A Chicago CPA Who Plans Ahead, Not One Who Just Files",
           subhead:
-            "Tax planning, business tax returns and monthly accounting from Brad Filmanowicz, CPA, MBA, EA. Start with a free consultation on Zoom.",
+            "Brad's tax planning clients typically save $35,000 in the first year, some as much as $200,000. If your plan doesn't return 3-to-1 on what it costs, it's free.",
         },
       }}
       heroBullets={[
@@ -39,12 +39,20 @@ export default function TaxPlanningLP() {
         stats: [
           { value: "$35,000", label: "Typical first-year savings for Brad's tax planning clients" },
           { value: "$200,000", label: "Saved in the first year by some clients" },
-          { value: "3-to-1", label: "Cost-benefit on your plan, or the plan is free" },
+          { value: "3-to-1", label: "Return on what your plan costs, or the plan is free", highlight: true },
         ],
         quote: "Give me 15 minutes and I'll show you where $30,000 is hiding.",
         footnote: "Savings depend on your income, business and situation. Your free consultation shows what applies to you.",
       }}
       showCourseOffer
+      heroStats={[
+        { value: "$35K", label: "Typical first-year savings" },
+        { value: "$200K", label: "Saved by some clients" },
+        { value: "3-to-1", label: "Return, or it's free", highlight: true },
+      ]}
+      formTitle="Book your free 15-minute savings review"
+      formSubtitle="Tell us a little about your business and Brad will show you where the savings are."
+      finalButton="Book my free 15 minutes"
       urgency="Most year-end tax moves only count if they're made before December 31."
       outcomesHeading="What tax planning can do for your business"
       outcomes={[
@@ -120,8 +128,8 @@ export default function TaxPlanningLP() {
           a: "Preparation reports what already happened. Planning changes what happens, by making decisions before the year ends instead of reporting them after.",
         },
       ]}
-      finalHeadline="Ready to plan ahead instead of just filing?"
-      finalSubtext="Book a free consultation with Brad Filmanowicz, CPA, MBA, EA and find out which strategies fit your business."
+      finalHeadline="Ready to find your $30,000?"
+      finalSubtext="Give Brad 15 minutes. Typical first-year savings are $35,000, and if your plan doesn't return 3-to-1 on what it costs, it's free."
     />
   );
 }

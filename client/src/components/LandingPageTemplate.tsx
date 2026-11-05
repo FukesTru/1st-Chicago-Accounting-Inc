@@ -21,6 +21,7 @@ import {
 
 const NAVY = "oklch(0.18 0.06 250)";
 const CYAN = "oklch(0.66 0.16 218)";
+const GOLD = "oklch(0.82 0.14 85)";
 const CREAM = "oklch(0.97 0.008 80)";
 const serif = { fontFamily: "'Playfair Display', serif" };
 
@@ -44,7 +45,14 @@ export interface LandingPageProps {
   finalHeadline: string;
   finalSubtext: string;
   /** Savings figures from Brad, shown in a navy band under the proof strip. Page copy only, never in ads. */
-  benefits?: { stats: { value: string; label: string }[]; quote: string; footnote?: string };
+  benefits?: { stats: { value: string; label: string; highlight?: boolean }[]; quote: string; footnote?: string };
+  /** Bold stat chips shown in the hero instead of the check-mark bullets. */
+  heroStats?: { value: string; label: string; highlight?: boolean }[];
+  /** Form card heading and helper line (defaults: "Book your free consultation"). */
+  formTitle?: string;
+  formSubtitle?: string;
+  /** Final call-to-action button text (default "Book a free consultation"). */
+  finalButton?: string;
   /** Show the free Teachable course box (COURSE_OFFER) near the bottom of the page. */
   showCourseOffer?: boolean;
 }
@@ -159,6 +167,25 @@ export default function LandingPageTemplate(props: LandingPageProps) {
               {v.headline}
             </h1>
             <p className="text-white/80 text-lg leading-relaxed mb-6">{v.subhead}</p>
+            {props.heroStats ? (
+              <ul className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
+                {props.heroStats.map((st) => (
+                  <li
+                    key={st.value}
+                    className="rounded-xl px-2.5 py-2.5 sm:px-4 sm:py-3 border"
+                    style={{
+                      borderColor: st.highlight ? GOLD : "rgb(255 255 255 / 0.2)",
+                      backgroundColor: st.highlight ? "oklch(0.82 0.14 85 / 0.12)" : "rgb(255 255 255 / 0.06)",
+                    }}
+                  >
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold leading-none mb-1" style={{ ...serif, color: st.highlight ? GOLD : "white" }}>
+                      {st.value}
+                    </p>
+                    <p className="text-xs sm:text-sm text-white/75 leading-snug">{st.label}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
             <ul className="space-y-3 mb-6">
               {props.heroBullets.map((b) => (
                 <li key={b} className="flex gap-3 text-white/90">
@@ -167,6 +194,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
                 </li>
               ))}
             </ul>
+            )}
             {props.priceLine && <p className="text-white font-semibold mb-4">{props.priceLine}</p>}
             {props.urgency && (
               <p className="inline-block text-sm text-white/90 border border-white/25 rounded px-3 py-2 mb-6">
@@ -196,8 +224,8 @@ export default function LandingPageTemplate(props: LandingPageProps) {
 
           <div id="get-started" className="lg:col-span-5 scroll-mt-4">
             <div className="bg-white rounded-xl shadow-xl p-5 md:p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-1" style={serif}>Book your free consultation</h2>
-              <p className="text-sm text-gray-500 mb-4">Tell us a little about your business and Brad will be in touch.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-1" style={serif}>{props.formTitle ?? "Book your free consultation"}</h2>
+              <p className="text-sm text-gray-500 mb-4">{props.formSubtitle ?? "Tell us a little about your business and Brad will be in touch."}</p>
               <iframe
                 src={`https://api.leadconnectorhq.com/widget/form/${LP_FORM_ID}`}
                 style={{ width: "100%", height: "620px", border: "none", borderRadius: "8px" }}
@@ -254,20 +282,29 @@ export default function LandingPageTemplate(props: LandingPageProps) {
           <div className="container max-w-5xl">
             <Reveal>
               <p className="section-label mb-3 text-center" style={{ color: CYAN }}>What planning is worth</p>
+              <h2 className="text-white text-3xl md:text-4xl font-bold text-center mb-10" style={{ ...serif, textWrap: "balance" }}>
+                Brad's tax planning pays for itself, or it's free
+              </h2>
             </Reveal>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 text-center">
               {props.benefits.stats.map((b, i) => (
                 <Reveal key={b.value} delay={i * 110}>
-                  <div className="rounded-2xl border border-white/15 bg-white/5 px-6 py-8 h-full">
-                    <p className="text-4xl md:text-5xl font-bold mb-3" style={{ ...serif, color: "white" }}>{b.value}</p>
-                    <p className="text-white/80 leading-relaxed">{b.label}</p>
+                  <div
+                    className="rounded-2xl border px-6 py-9 h-full"
+                    style={{
+                      borderColor: b.highlight ? GOLD : "rgb(255 255 255 / 0.15)",
+                      backgroundColor: b.highlight ? "oklch(0.82 0.14 85 / 0.1)" : "rgb(255 255 255 / 0.05)",
+                    }}
+                  >
+                    <p className="text-5xl md:text-6xl font-bold mb-3" style={{ ...serif, color: b.highlight ? GOLD : "white" }}>{b.value}</p>
+                    <p className="leading-relaxed" style={{ color: b.highlight ? GOLD : "rgb(255 255 255 / 0.8)" }}>{b.label}</p>
                   </div>
                 </Reveal>
               ))}
             </div>
             <Reveal delay={200}>
               <blockquote className="mt-10 md:mt-12 text-center">
-                <p className="text-2xl md:text-3xl leading-snug" style={{ ...serif, textWrap: "balance" }}>
+                <p className="text-3xl md:text-4xl leading-snug" style={{ ...serif, textWrap: "balance" }}>
                   &ldquo;{props.benefits.quote}&rdquo;
                 </p>
                 <footer className="mt-3 text-white/70">Brad Filmanowicz, CPA, MBA, EA</footer>
@@ -495,7 +532,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
             <h2 className="text-white text-3xl md:text-4xl font-bold mb-4" style={serif}>{props.finalHeadline}</h2>
             <p className="text-white/75 text-lg mb-8">{props.finalSubtext}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="#get-started" className="btn-primary px-8 py-4 text-base">Book a free consultation</a>
+              <a href="#get-started" className="btn-primary px-8 py-4 text-base">{props.finalButton ?? "Book a free consultation"}</a>
               <PhoneLink location="final_cta" className="btn-outline-white px-8 py-4 text-base" label={`Call ${PHONE_DISPLAY}`} />
             </div>
             <p className="flex items-center justify-center gap-2 text-white/50 text-sm mt-6">
