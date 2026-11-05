@@ -43,6 +43,10 @@ export interface LandingPageProps {
   faqs: { q: string; a: string }[];
   finalHeadline: string;
   finalSubtext: string;
+  /** Savings figures from Brad, shown in a navy band under the proof strip. Page copy only, never in ads. */
+  benefits?: { stats: { value: string; label: string }[]; quote: string; footnote?: string };
+  /** Show the free Teachable course box (COURSE_OFFER) near the bottom of the page. */
+  showCourseOffer?: boolean;
 }
 
 /** Everything in this strip is verified on Brad's own site. */
@@ -244,6 +248,48 @@ export default function LandingPageTemplate(props: LandingPageProps) {
         </div>
       </section>
 
+      {/* ── 2b. BENEFITS (Brad's savings figures) ── */}
+      {props.benefits && (
+        <section className="py-14 md:py-20 text-white" style={{ backgroundColor: NAVY }}>
+          <div className="container max-w-5xl">
+            <Reveal>
+              <p className="section-label mb-3 text-center" style={{ color: CYAN }}>What planning is worth</p>
+            </Reveal>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 text-center">
+              {props.benefits.stats.map((b, i) => (
+                <Reveal key={b.value} delay={i * 110}>
+                  <div className="rounded-2xl border border-white/15 bg-white/5 px-6 py-8 h-full">
+                    <p className="text-4xl md:text-5xl font-bold mb-3" style={{ ...serif, color: "white" }}>{b.value}</p>
+                    <p className="text-white/80 leading-relaxed">{b.label}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal delay={200}>
+              <blockquote className="mt-10 md:mt-12 text-center">
+                <p className="text-2xl md:text-3xl leading-snug" style={{ ...serif, textWrap: "balance" }}>
+                  &ldquo;{props.benefits.quote}&rdquo;
+                </p>
+                <footer className="mt-3 text-white/70">Brad Filmanowicz, CPA, MBA, EA</footer>
+              </blockquote>
+              <div className="mt-8 text-center">
+                <a
+                  href="#get-started"
+                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-white"
+                  style={{ backgroundColor: CYAN }}
+                  onClick={() => trackEvent("cta_click", { click_location: "benefits" })}
+                >
+                  Book my free 15 minutes <ArrowRight size={18} />
+                </a>
+              </div>
+              {props.benefits.footnote && (
+                <p className="mt-6 text-center text-xs text-white/50">{props.benefits.footnote}</p>
+              )}
+            </Reveal>
+          </div>
+        </section>
+      )}
+
       {/* ── 3. WHAT YOU GET ── */}
       <section className="py-16 md:py-24 bg-white">
         <div className="container">
@@ -394,8 +440,8 @@ export default function LandingPageTemplate(props: LandingPageProps) {
       {/* ── 7. REVIEWS (rotating library of real Google reviews) ── */}
       <ReviewsCarousel />
 
-      {/* ── 8. FREE COURSE (off until the promo code arrives) ── */}
-      {COURSE_OFFER.enabled && (
+      {/* ── 8. FREE COURSE ── */}
+      {props.showCourseOffer && COURSE_OFFER.enabled && (
         <section className="py-14" style={{ backgroundColor: CREAM }}>
           <div className="container max-w-3xl text-center">
             <Reveal>

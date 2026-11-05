@@ -25,12 +25,13 @@ export const GOOGLE_RATING: { stars: string; count: number } | null = { stars: "
 // BLANK: a "plans from $X/month" line, only if Brad agrees to show a starting price.
 export const MONTHLY_STARTING_PRICE: string | null = null;
 
-// BLANK: free Teachable course offer. Stays hidden until Brad sends the promo code that makes it free.
+// Free Teachable course offer. Promo code "Free" confirmed by Brad 2026-11-05.
+// Shown on pages that pass showCourseOffer, and on /thank-you.
 export const COURSE_OFFER = {
-  enabled: false,
+  enabled: true,
   title: "Free Tax Planning Course",
   url: "https://brad-s-school19.teachable.com/purchase?product_id=6835675",
-  promoCode: "",
+  promoCode: "Free",
 };
 
 /** Push an event to Google Tag Manager's dataLayer (no-op until GTM is installed). */

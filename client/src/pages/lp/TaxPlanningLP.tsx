@@ -35,6 +35,16 @@ export default function TaxPlanningLP() {
         "Entity, S corp, retirement and year-end strategies reviewed for your situation",
         "Business and personal returns handled together, year-round",
       ]}
+      benefits={{
+        stats: [
+          { value: "$35,000", label: "Typical first-year savings for Brad's tax planning clients" },
+          { value: "$200,000", label: "Saved in the first year by some clients" },
+          { value: "3-to-1", label: "Cost-benefit on your plan, or the plan is free" },
+        ],
+        quote: "Give me 15 minutes and I'll show you where $30,000 is hiding.",
+        footnote: "Savings depend on your income, business and situation. Your free consultation shows what applies to you.",
+      }}
+      showCourseOffer
       urgency="Most year-end tax moves only count if they're made before December 31."
       outcomesHeading="What tax planning can do for your business"
       outcomes={[
