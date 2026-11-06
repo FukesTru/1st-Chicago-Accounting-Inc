@@ -260,19 +260,23 @@ export default function LandingPageTemplate(props: LandingPageProps) {
         </div>
       </section>
 
-      {/* ── 2. PROOF STRIP ── */}
+      {/* ── 2. PROOF STRIP (scrolling ticker) ── */}
       <section className="bg-white border-b border-gray-100">
-        <div className="container">
-          <ul className="flex flex-wrap justify-center gap-x-8 gap-y-3 py-5 text-sm text-gray-700">
-            {PROOF.map((p, i) => (
-              <li key={i} className="flex items-center gap-2 whitespace-nowrap">
-                {p.icon === "star" && <Star size={16} fill="currentColor" className="text-amber-400 shrink-0" />}
-                {p.icon === "shield" && <ShieldCheck size={16} className="shrink-0" style={{ color: CYAN }} />}
-                {p.icon === "book" && <BookOpen size={16} className="shrink-0" style={{ color: CYAN }} />}
-                <span>{p.text}</span>
-              </li>
+        <div className="lp-ticker py-5 md:py-6">
+          <div className="lp-ticker__track">
+            {[0, 1].map((copy) => (
+              <ul key={copy} aria-hidden={copy === 1 ? "true" : undefined} className="flex shrink-0 items-center">
+                {PROOF.map((p, i) => (
+                  <li key={i} className="flex items-center gap-2.5 whitespace-nowrap px-6 md:px-10 text-lg md:text-2xl font-medium text-gray-800">
+                    {p.icon === "star" && <Star size={24} fill="currentColor" className="text-amber-400 shrink-0" />}
+                    {p.icon === "shield" && <ShieldCheck size={24} className="shrink-0" style={{ color: CYAN }} />}
+                    {p.icon === "book" && <BookOpen size={24} className="shrink-0" style={{ color: CYAN }} />}
+                    <span>{p.text}</span>
+                  </li>
+                ))}
+              </ul>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
