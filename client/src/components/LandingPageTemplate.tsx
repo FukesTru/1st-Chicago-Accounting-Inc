@@ -1,11 +1,11 @@
 /**
  * LandingPageTemplate — one-offer page for Google Ads traffic.
- * Structure: Hero + form (above the fold) → Proof strip → What you get → How it works → Meet Brad
- *            → Book online → Reviews carousel → (optional free course) → FAQ → Final CTA.
+ * Structure: Hero + form (above the fold) → Book online → (optional savings band) → What you get
+ *            → How it works → Meet Brad → Reviews carousel → (optional free course) → FAQ → Final CTA.
  * Headline variants are picked with ?v=<key> so one page can match several ad groups.
  */
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, BookOpen, CheckCircle2, Phone, ShieldCheck, Star } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, CheckCircle2, Phone, Star } from "lucide-react";
 import LandingLayout, { PhoneLink } from "./LandingLayout";
 import Reveal from "./Reveal";
 import ReviewsCarousel from "./ReviewsCarousel";
@@ -21,6 +21,7 @@ import {
 
 const NAVY = "oklch(0.18 0.06 250)";
 const CYAN = "oklch(0.66 0.16 218)";
+const GOLD = "oklch(0.82 0.14 85)";
 const CREAM = "oklch(0.97 0.008 80)";
 const serif = { fontFamily: "'Playfair Display', serif" };
 
@@ -43,33 +44,18 @@ export interface LandingPageProps {
   faqs: { q: string; a: string }[];
   finalHeadline: string;
   finalSubtext: string;
+  /** Savings figures from Brad, shown in a navy band under the proof strip. Page copy only, never in ads. */
+  benefits?: { stats: { value: string; label: string; highlight?: boolean }[]; quote: string; footnote?: string };
+  /** Bold stat chips shown in the hero instead of the check-mark bullets. */
+  heroStats?: { value: string; label: string; highlight?: boolean }[];
+  /** Form card heading and helper line (defaults: "Book your free consultation"). */
+  formTitle?: string;
+  formSubtitle?: string;
+  /** Final call-to-action button text (default "Book a free consultation"). */
+  finalButton?: string;
+  /** Show the free Teachable course box (COURSE_OFFER) near the bottom of the page. */
+  showCourseOffer?: boolean;
 }
-
-/** Everything in this strip is verified on Brad's own site. */
-const PROOF: { icon: "star" | "shield" | "book"; text: ReactNode }[] = [
-  {
-    icon: "star",
-    text: GOOGLE_RATING ? (
-      <>
-        <b className="text-gray-900">{GOOGLE_RATING.stars}</b> on Google <span className="text-gray-400">· {GOOGLE_RATING.count} reviews</span>
-      </>
-    ) : (
-      "Google reviews"
-    ),
-  },
-  { icon: "shield", text: "CPA since 1994" },
-  { icon: "shield", text: "Enrolled Agent" },
-  { icon: "shield", text: "MBA, Finance" },
-  { icon: "shield", text: "Practicing since 1997" },
-  {
-    icon: "book",
-    text: (
-      <>
-        Author of <em>Profits Driven</em>
-      </>
-    ),
-  },
-];
 
 const BRAD_FACTS = [
   "CPA since 1994 and an Enrolled Agent, federally authorized to represent you before the IRS.",
@@ -128,16 +114,81 @@ export default function LandingPageTemplate(props: LandingPageProps) {
   // Mount the booking calendar only when the visitor gets near it, so it can't steal focus on load.
   const bookRef = useRef<HTMLElement>(null);
   const [showBooking, setShowBooking] = useState(false);
+  const [calendarLoadedAt, setCalendarLoadedAt] = useState(0);
+  const calendarRef = useRef<HTMLIFrameElement>(null);
+  const calendarBoxRef = useRef<HTMLDivElement>(null);
+
+  // The OnceHub page focuses itself after it loads (sometimes more than once), and the browser can then
+  // jump the parent page to the calendar. For a few seconds after the calendar loads, undo a jump only
+  // when the visitor isn't touching, wheeling or pressing keys, so their own scrolling (including a
+  // phone fling that coasts after the finger lifts) is never undone.
   useEffect(() => {
-    const el = bookRef.current;
+    if (!showBooking) return;
+    const start = calendarLoadedAt || Date.now();
+    const GUARD_MS = 10_000;
+    let lastY = window.scrollY;
+    let lastInput = 0;
+    let touching = false;
+    let touchEndedAt = 0;
+    const mark = () => { lastInput = Date.now(); };
+    const onTouchStart = () => { touching = true; mark(); };
+    const onTouchEnd = () => { touching = false; touchEndedAt = Date.now(); };
+    const visitorIsScrolling = () => {
+      const now = Date.now();
+      return touching || now - lastInput < 600 || now - touchEndedAt < 2000;
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (
+        Date.now() - start < GUARD_MS &&
+        !visitorIsScrolling() &&
+        document.activeElement === calendarRef.current &&
+        Math.abs(y - lastY) > 80
+      ) {
+        calendarRef.current?.blur();
+        window.scrollTo({ top: lastY, behavior: "instant" as ScrollBehavior });
+        return;
+      }
+      lastY = y;
+    };
+    const inputs: (keyof WindowEventMap)[] = ["wheel", "keydown", "mousedown", "pointerdown"];
+    inputs.forEach((t) => window.addEventListener(t, mark, { passive: true }));
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    const remove = () => {
+      inputs.forEach((t) => window.removeEventListener(t, mark));
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
+      window.removeEventListener("scroll", onScroll);
+    };
+    const stop = window.setTimeout(remove, Math.max(0, start + GUARD_MS - Date.now()) + 6_000);
+    return () => {
+      window.clearTimeout(stop);
+      remove();
+    };
+  }, [showBooking, calendarLoadedAt]);
+
+  // Mount the calendar once the visitor has scrolled and its box is actually on screen, so whatever
+  // it focuses is already in view and there's nothing for the browser to jump to.
+  useEffect(() => {
+    const el = calendarBoxRef.current;
     if (!el || showBooking) return;
     if (!("IntersectionObserver" in window)) { setShowBooking(true); return; }
+    let visible = false;
+    let scrolled = window.scrollY > 0;
+    const tryMount = () => { if (visible && scrolled) { setShowBooking(true); cleanup(); } };
     const io = new IntersectionObserver(
-      (entries) => { if (entries.some((e) => e.isIntersecting)) { setShowBooking(true); io.disconnect(); } },
-      { rootMargin: "600px 0px" },
+      (entries) => { visible = entries.some((e) => e.isIntersecting); tryMount(); },
+      { threshold: 0.12 },
     );
+    const onScroll = () => { scrolled = true; tryMount(); };
+    const cleanup = () => { io.disconnect(); window.removeEventListener("scroll", onScroll); };
     io.observe(el);
-    return () => io.disconnect();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return cleanup;
   }, [showBooking]);
 
   return (
@@ -155,6 +206,25 @@ export default function LandingPageTemplate(props: LandingPageProps) {
               {v.headline}
             </h1>
             <p className="text-white/80 text-lg leading-relaxed mb-6">{v.subhead}</p>
+            {props.heroStats ? (
+              <ul className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
+                {props.heroStats.map((st) => (
+                  <li
+                    key={st.value}
+                    className="rounded-xl px-2.5 py-2.5 sm:px-4 sm:py-3 border"
+                    style={{
+                      borderColor: st.highlight ? GOLD : "rgb(255 255 255 / 0.2)",
+                      backgroundColor: st.highlight ? "oklch(0.82 0.14 85 / 0.12)" : "rgb(255 255 255 / 0.06)",
+                    }}
+                  >
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold leading-none mb-1" style={{ ...serif, color: st.highlight ? GOLD : "white" }}>
+                      {st.value}
+                    </p>
+                    <p className="text-xs sm:text-sm text-white/75 leading-snug">{st.label}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
             <ul className="space-y-3 mb-6">
               {props.heroBullets.map((b) => (
                 <li key={b} className="flex gap-3 text-white/90">
@@ -163,6 +233,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
                 </li>
               ))}
             </ul>
+            )}
             {props.priceLine && <p className="text-white font-semibold mb-4">{props.priceLine}</p>}
             {props.urgency && (
               <p className="inline-block text-sm text-white/90 border border-white/25 rounded px-3 py-2 mb-6">
@@ -192,8 +263,8 @@ export default function LandingPageTemplate(props: LandingPageProps) {
 
           <div id="get-started" className="lg:col-span-5 scroll-mt-4">
             <div className="bg-white rounded-xl shadow-xl p-5 md:p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-1" style={serif}>Book your free consultation</h2>
-              <p className="text-sm text-gray-500 mb-4">Tell us a little about your business and Brad will be in touch.</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-1" style={serif}>{props.formTitle ?? "Book your free consultation"}</h2>
+              <p className="text-sm text-gray-500 mb-4">{props.formSubtitle ?? "Tell us a little about your business and Brad will be in touch."}</p>
               <iframe
                 src={`https://api.leadconnectorhq.com/widget/form/${LP_FORM_ID}`}
                 style={{ width: "100%", height: "620px", border: "none", borderRadius: "8px" }}
@@ -228,21 +299,102 @@ export default function LandingPageTemplate(props: LandingPageProps) {
         </div>
       </section>
 
-      {/* ── 2. PROOF STRIP ── */}
-      <section className="bg-white border-b border-gray-100">
+      {/* ── 2. BOOK ONLINE (right under the hero) ── */}
+      <section id="book" ref={bookRef} className="py-16 md:py-24 scroll-mt-4" style={{ backgroundColor: CREAM }}>
         <div className="container">
-          <ul className="flex flex-wrap justify-center gap-x-8 gap-y-3 py-5 text-sm text-gray-700">
-            {PROOF.map((p, i) => (
-              <li key={i} className="flex items-center gap-2 whitespace-nowrap">
-                {p.icon === "star" && <Star size={16} fill="currentColor" className="text-amber-400 shrink-0" />}
-                {p.icon === "shield" && <ShieldCheck size={16} className="shrink-0" style={{ color: CYAN }} />}
-                {p.icon === "book" && <BookOpen size={16} className="shrink-0" style={{ color: CYAN }} />}
-                <span>{p.text}</span>
-              </li>
-            ))}
-          </ul>
+          <Reveal>
+            <SectionHeader
+              eyebrow="Book online"
+              title="Pick a time with Brad"
+              lede="Free 1-on-1 consultation over Zoom. Book directly on his calendar."
+            />
+          </Reveal>
+          <Reveal>
+            <div
+              ref={calendarBoxRef}
+              className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+            >
+              {showBooking ? (
+                <iframe
+                  ref={calendarRef}
+                  src={BOOKING_URL}
+                  style={{ width: "100%", height: "760px", border: "none" }}
+                  title="Schedule a consultation with Brad Filmanowicz"
+                  onLoad={() => setCalendarLoadedAt(Date.now())}
+                />
+              ) : (
+                <div style={{ height: "760px" }} className="grid place-items-center text-gray-400 text-sm">
+                  Loading Brad's calendar…
+                </div>
+              )}
+            </div>
+            <p className="text-center text-sm text-gray-500 mt-4">
+              Calendar not loading?{" "}
+              <a
+                href={BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline"
+                style={{ color: CYAN }}
+                onClick={() => trackEvent("booking_link_click", { click_location: "book_section" })}
+              >
+                Open the booking page
+              </a>
+            </p>
+          </Reveal>
         </div>
       </section>
+
+      {/* ── 2b. BENEFITS (Brad's savings figures) ── */}
+      {props.benefits && (
+        <section className="py-14 md:py-20 text-white" style={{ backgroundColor: NAVY }}>
+          <div className="container max-w-5xl">
+            <Reveal>
+              <p className="section-label mb-3 text-center" style={{ color: CYAN }}>What planning is worth</p>
+              <h2 className="text-white text-3xl md:text-4xl font-bold text-center mb-10" style={{ ...serif, textWrap: "balance" }}>
+                Brad's tax planning pays for itself, or it's free
+              </h2>
+            </Reveal>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 text-center">
+              {props.benefits.stats.map((b, i) => (
+                <Reveal key={b.value} delay={i * 110}>
+                  <div
+                    className="rounded-2xl border px-6 py-9 h-full"
+                    style={{
+                      borderColor: b.highlight ? GOLD : "rgb(255 255 255 / 0.15)",
+                      backgroundColor: b.highlight ? "oklch(0.82 0.14 85 / 0.1)" : "rgb(255 255 255 / 0.05)",
+                    }}
+                  >
+                    <p className="text-5xl md:text-6xl font-bold mb-3" style={{ ...serif, color: b.highlight ? GOLD : "white" }}>{b.value}</p>
+                    <p className="leading-relaxed" style={{ color: b.highlight ? GOLD : "rgb(255 255 255 / 0.8)" }}>{b.label}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal delay={200}>
+              <blockquote className="mt-10 md:mt-12 text-center">
+                <p className="text-3xl md:text-4xl leading-snug" style={{ ...serif, textWrap: "balance" }}>
+                  &ldquo;{props.benefits.quote}&rdquo;
+                </p>
+                <footer className="mt-3 text-white/70">Brad Filmanowicz, CPA, MBA, EA</footer>
+              </blockquote>
+              <div className="mt-8 text-center">
+                <a
+                  href="#get-started"
+                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-white"
+                  style={{ backgroundColor: CYAN }}
+                  onClick={() => trackEvent("cta_click", { click_location: "benefits" })}
+                >
+                  Book my free 15 minutes <ArrowRight size={18} />
+                </a>
+              </div>
+              {props.benefits.footnote && (
+                <p className="mt-6 text-center text-xs text-white/50">{props.benefits.footnote}</p>
+              )}
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {/* ── 3. WHAT YOU GET ── */}
       <section className="py-16 md:py-24 bg-white">
@@ -352,50 +504,11 @@ export default function LandingPageTemplate(props: LandingPageProps) {
         </div>
       </section>
 
-      {/* ── 6. BOOK ONLINE ── */}
-      <section id="book" ref={bookRef} className="py-16 md:py-24 scroll-mt-4" style={{ backgroundColor: CREAM }}>
-        <div className="container">
-          <Reveal>
-            <SectionHeader
-              eyebrow="Book online"
-              title="Pick a time with Brad"
-              lede="Free 1-on-1 consultation over Zoom. Book directly on his calendar."
-            />
-          </Reveal>
-          <Reveal>
-            <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-              {showBooking ? (
-                <iframe
-                  src={BOOKING_URL}
-                  style={{ width: "100%", height: "760px", border: "none" }}
-                  title="Schedule a consultation with Brad Filmanowicz"
-                />
-              ) : (
-                <div style={{ height: "760px" }} aria-hidden="true" />
-              )}
-            </div>
-            <p className="text-center text-sm text-gray-500 mt-4">
-              Calendar not loading?{" "}
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline"
-                style={{ color: CYAN }}
-                onClick={() => trackEvent("booking_link_click", { click_location: "book_section" })}
-              >
-                Open the booking page
-              </a>
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ── 7. REVIEWS (rotating library of real Google reviews) ── */}
       <ReviewsCarousel />
 
-      {/* ── 8. FREE COURSE (off until the promo code arrives) ── */}
-      {COURSE_OFFER.enabled && (
+      {/* ── 8. FREE COURSE ── */}
+      {props.showCourseOffer && COURSE_OFFER.enabled && (
         <section className="py-14" style={{ backgroundColor: CREAM }}>
           <div className="container max-w-3xl text-center">
             <Reveal>
@@ -449,7 +562,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
             <h2 className="text-white text-3xl md:text-4xl font-bold mb-4" style={serif}>{props.finalHeadline}</h2>
             <p className="text-white/75 text-lg mb-8">{props.finalSubtext}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="#get-started" className="btn-primary px-8 py-4 text-base">Book a free consultation</a>
+              <a href="#get-started" className="btn-primary px-8 py-4 text-base">{props.finalButton ?? "Book a free consultation"}</a>
               <PhoneLink location="final_cta" className="btn-outline-white px-8 py-4 text-base" label={`Call ${PHONE_DISPLAY}`} />
             </div>
             <p className="flex items-center justify-center gap-2 text-white/50 text-sm mt-6">
