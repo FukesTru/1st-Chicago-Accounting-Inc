@@ -1,11 +1,11 @@
 /**
  * LandingPageTemplate — one-offer page for Google Ads traffic.
- * Structure: Hero + form (above the fold) → Proof strip → What you get → How it works → Meet Brad
- *            → Book online → Reviews carousel → (optional free course) → FAQ → Final CTA.
+ * Structure: Hero + form (above the fold) → Book online → (optional savings band) → What you get
+ *            → How it works → Meet Brad → Reviews carousel → (optional free course) → FAQ → Final CTA.
  * Headline variants are picked with ?v=<key> so one page can match several ad groups.
  */
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, BookOpen, CheckCircle2, Phone, ShieldCheck, Star } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, CheckCircle2, Phone, Star } from "lucide-react";
 import LandingLayout, { PhoneLink } from "./LandingLayout";
 import Reveal from "./Reveal";
 import ReviewsCarousel from "./ReviewsCarousel";
@@ -56,32 +56,6 @@ export interface LandingPageProps {
   /** Show the free Teachable course box (COURSE_OFFER) near the bottom of the page. */
   showCourseOffer?: boolean;
 }
-
-/** Everything in this strip is verified on Brad's own site. */
-const PROOF: { icon: "star" | "shield" | "book"; text: ReactNode }[] = [
-  {
-    icon: "star",
-    text: GOOGLE_RATING ? (
-      <>
-        <b className="text-gray-900">{GOOGLE_RATING.stars}</b> on Google <span className="text-gray-400">· {GOOGLE_RATING.count} reviews</span>
-      </>
-    ) : (
-      "Google reviews"
-    ),
-  },
-  { icon: "shield", text: "CPA since 1994" },
-  { icon: "shield", text: "Enrolled Agent" },
-  { icon: "shield", text: "MBA, Finance" },
-  { icon: "shield", text: "Practicing since 1997" },
-  {
-    icon: "book",
-    text: (
-      <>
-        Author of <em>Profits Driven</em>
-      </>
-    ),
-  },
-];
 
 const BRAD_FACTS = [
   "CPA since 1994 and an Enrolled Agent, federally authorized to represent you before the IRS.",
@@ -144,12 +118,18 @@ export default function LandingPageTemplate(props: LandingPageProps) {
     const el = bookRef.current;
     if (!el || showBooking) return;
     if (!("IntersectionObserver" in window)) { setShowBooking(true); return; }
+    let near = false;
+    let scrolled = window.scrollY > 0;
+    const tryMount = () => { if (near && scrolled) { setShowBooking(true); cleanup(); } };
     const io = new IntersectionObserver(
-      (entries) => { if (entries.some((e) => e.isIntersecting)) { setShowBooking(true); io.disconnect(); } },
-      { rootMargin: "600px 0px" },
+      (entries) => { near = entries.some((e) => e.isIntersecting); tryMount(); },
+      { rootMargin: "400px 0px" },
     );
+    const onScroll = () => { scrolled = true; tryMount(); };
+    const cleanup = () => { io.disconnect(); window.removeEventListener("scroll", onScroll); };
     io.observe(el);
-    return () => io.disconnect();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return cleanup;
   }, [showBooking]);
 
   return (
@@ -260,23 +240,42 @@ export default function LandingPageTemplate(props: LandingPageProps) {
         </div>
       </section>
 
-      {/* ── 2. PROOF STRIP (scrolling ticker) ── */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="lp-ticker py-5 md:py-6">
-          <div className="lp-ticker__track">
-            {[0, 1].map((copy) => (
-              <ul key={copy} aria-hidden={copy === 1 ? "true" : undefined} className="flex shrink-0 items-center">
-                {PROOF.map((p, i) => (
-                  <li key={i} className="flex items-center gap-2.5 whitespace-nowrap px-6 md:px-10 text-lg md:text-2xl font-medium text-gray-800">
-                    {p.icon === "star" && <Star size={24} fill="currentColor" className="text-amber-400 shrink-0" />}
-                    {p.icon === "shield" && <ShieldCheck size={24} className="shrink-0" style={{ color: CYAN }} />}
-                    {p.icon === "book" && <BookOpen size={24} className="shrink-0" style={{ color: CYAN }} />}
-                    <span>{p.text}</span>
-                  </li>
-                ))}
-              </ul>
-            ))}
-          </div>
+      {/* ── 2. BOOK ONLINE (right under the hero) ── */}
+      <section id="book" ref={bookRef} className="py-16 md:py-24 scroll-mt-4" style={{ backgroundColor: CREAM }}>
+        <div className="container">
+          <Reveal>
+            <SectionHeader
+              eyebrow="Book online"
+              title="Pick a time with Brad"
+              lede="Free 1-on-1 consultation over Zoom. Book directly on his calendar."
+            />
+          </Reveal>
+          <Reveal>
+            <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              {showBooking ? (
+                <iframe
+                  src={BOOKING_URL}
+                  style={{ width: "100%", height: "760px", border: "none" }}
+                  title="Schedule a consultation with Brad Filmanowicz"
+                />
+              ) : (
+                <div style={{ height: "760px" }} aria-hidden="true" />
+              )}
+            </div>
+            <p className="text-center text-sm text-gray-500 mt-4">
+              Calendar not loading?{" "}
+              <a
+                href={BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline"
+                style={{ color: CYAN }}
+                onClick={() => trackEvent("booking_link_click", { click_location: "book_section" })}
+              >
+                Open the booking page
+              </a>
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -435,45 +434,6 @@ export default function LandingPageTemplate(props: LandingPageProps) {
                 label={`or call ${PHONE_DISPLAY}`}
               />
             </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── 6. BOOK ONLINE ── */}
-      <section id="book" ref={bookRef} className="py-16 md:py-24 scroll-mt-4" style={{ backgroundColor: CREAM }}>
-        <div className="container">
-          <Reveal>
-            <SectionHeader
-              eyebrow="Book online"
-              title="Pick a time with Brad"
-              lede="Free 1-on-1 consultation over Zoom. Book directly on his calendar."
-            />
-          </Reveal>
-          <Reveal>
-            <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-              {showBooking ? (
-                <iframe
-                  src={BOOKING_URL}
-                  style={{ width: "100%", height: "760px", border: "none" }}
-                  title="Schedule a consultation with Brad Filmanowicz"
-                />
-              ) : (
-                <div style={{ height: "760px" }} aria-hidden="true" />
-              )}
-            </div>
-            <p className="text-center text-sm text-gray-500 mt-4">
-              Calendar not loading?{" "}
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium underline"
-                style={{ color: CYAN }}
-                onClick={() => trackEvent("booking_link_click", { click_location: "book_section" })}
-              >
-                Open the booking page
-              </a>
-            </p>
           </Reveal>
         </div>
       </section>
