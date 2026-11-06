@@ -64,10 +64,17 @@
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
       data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
-    <!-- LeadConnector Chat Widget -->
-    <script
-      src="https://widgets.leadconnectorhq.com/loader.js"
-      data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
-      data-widget-id="6a59e249c40835bdcd9ba1f9"></script>
+    <!-- LeadConnector Chat Widget (not on the Google Ads landing pages, /thank-you or /booked) -->
+    <script>
+      (function () {
+        var p = window.location.pathname;
+        if (/^\/lp(\/|$)/.test(p) || /^\/(thank-you|booked)\/?$/.test(p)) return;
+        var s = document.createElement("script");
+        s.src = "https://widgets.leadconnectorhq.com/loader.js";
+        s.setAttribute("data-resources-url", "https://widgets.leadconnectorhq.com/chat-widget/loader.js");
+        s.setAttribute("data-widget-id", "6a59e249c40835bdcd9ba1f9");
+        document.body.appendChild(s);
+      })();
+    </script>
   </body>
 </html>
