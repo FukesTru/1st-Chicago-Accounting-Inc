@@ -11,6 +11,9 @@ import "./index.css";
 
 loadGtm();
 
+// Landing-page fade-ups: hide not-yet-revealed blocks from the very first paint (no visible→hidden flash).
+if ("IntersectionObserver" in window) document.documentElement.classList.add("lp-js");
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {

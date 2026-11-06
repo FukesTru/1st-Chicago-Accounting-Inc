@@ -116,44 +116,73 @@ export default function LandingPageTemplate(props: LandingPageProps) {
   const [showBooking, setShowBooking] = useState(false);
   const [calendarLoadedAt, setCalendarLoadedAt] = useState(0);
   const calendarRef = useRef<HTMLIFrameElement>(null);
+  const calendarBoxRef = useRef<HTMLDivElement>(null);
 
-  // The OnceHub page focuses itself after it loads (sometimes more than once), and the browser then
-  // jumps the parent page down to the calendar. For the first 10 seconds after the calendar mounts,
-  // undo any jump that happens while focus sits in the calendar. A single scroll event that moves
-  // more than 250px is a focus jump, not the visitor scrolling.
+  // The OnceHub page focuses itself after it loads (sometimes more than once), and the browser can then
+  // jump the parent page to the calendar. For a few seconds after the calendar loads, undo a jump only
+  // when the visitor isn't touching, wheeling or pressing keys, so their own scrolling (including a
+  // phone fling that coasts after the finger lifts) is never undone.
   useEffect(() => {
     if (!showBooking) return;
-    const until = Date.now() + 10_000 + (calendarLoadedAt ? calendarLoadedAt - Date.now() : 0);
+    const start = calendarLoadedAt || Date.now();
+    const GUARD_MS = 10_000;
     let lastY = window.scrollY;
-    const restore = (y: number) => {
-      calendarRef.current?.blur();
-      window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+    let lastInput = 0;
+    let touching = false;
+    let touchEndedAt = 0;
+    const mark = () => { lastInput = Date.now(); };
+    const onTouchStart = () => { touching = true; mark(); };
+    const onTouchEnd = () => { touching = false; touchEndedAt = Date.now(); };
+    const visitorIsScrolling = () => {
+      const now = Date.now();
+      return touching || now - lastInput < 600 || now - touchEndedAt < 2000;
     };
     const onScroll = () => {
       const y = window.scrollY;
-      if (Date.now() < until && document.activeElement === calendarRef.current && Math.abs(y - lastY) > 250) {
-        restore(lastY);
+      if (
+        Date.now() - start < GUARD_MS &&
+        !visitorIsScrolling() &&
+        document.activeElement === calendarRef.current &&
+        Math.abs(y - lastY) > 80
+      ) {
+        calendarRef.current?.blur();
+        window.scrollTo({ top: lastY, behavior: "instant" as ScrollBehavior });
         return;
       }
       lastY = y;
     };
+    const inputs: (keyof WindowEventMap)[] = ["wheel", "keydown", "mousedown", "pointerdown"];
+    inputs.forEach((t) => window.addEventListener(t, mark, { passive: true }));
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
-    const stop = window.setTimeout(() => window.removeEventListener("scroll", onScroll), Math.max(0, until - Date.now()));
-    return () => {
-      window.clearTimeout(stop);
+    const remove = () => {
+      inputs.forEach((t) => window.removeEventListener(t, mark));
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
       window.removeEventListener("scroll", onScroll);
     };
+    const stop = window.setTimeout(remove, Math.max(0, start + GUARD_MS - Date.now()) + 6_000);
+    return () => {
+      window.clearTimeout(stop);
+      remove();
+    };
   }, [showBooking, calendarLoadedAt]);
+
+  // Mount the calendar once the visitor has scrolled and its box is actually on screen, so whatever
+  // it focuses is already in view and there's nothing for the browser to jump to.
   useEffect(() => {
-    const el = bookRef.current;
+    const el = calendarBoxRef.current;
     if (!el || showBooking) return;
     if (!("IntersectionObserver" in window)) { setShowBooking(true); return; }
-    let near = false;
+    let visible = false;
     let scrolled = window.scrollY > 0;
-    const tryMount = () => { if (near && scrolled) { setShowBooking(true); cleanup(); } };
+    const tryMount = () => { if (visible && scrolled) { setShowBooking(true); cleanup(); } };
     const io = new IntersectionObserver(
-      (entries) => { near = entries.some((e) => e.isIntersecting); tryMount(); },
-      { rootMargin: "400px 0px" },
+      (entries) => { visible = entries.some((e) => e.isIntersecting); tryMount(); },
+      { threshold: 0.12 },
     );
     const onScroll = () => { scrolled = true; tryMount(); };
     const cleanup = () => { io.disconnect(); window.removeEventListener("scroll", onScroll); };
@@ -282,6 +311,7 @@ export default function LandingPageTemplate(props: LandingPageProps) {
           </Reveal>
           <Reveal>
             <div
+              ref={calendarBoxRef}
               className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
             >
               {showBooking ? (
@@ -293,7 +323,9 @@ export default function LandingPageTemplate(props: LandingPageProps) {
                   onLoad={() => setCalendarLoadedAt(Date.now())}
                 />
               ) : (
-                <div style={{ height: "760px" }} aria-hidden="true" />
+                <div style={{ height: "760px" }} className="grid place-items-center text-gray-400 text-sm">
+                  Loading Brad's calendar…
+                </div>
               )}
             </div>
             <p className="text-center text-sm text-gray-500 mt-4">
