@@ -114,6 +114,36 @@ export default function LandingPageTemplate(props: LandingPageProps) {
   // Mount the booking calendar only when the visitor gets near it, so it can't steal focus on load.
   const bookRef = useRef<HTMLElement>(null);
   const [showBooking, setShowBooking] = useState(false);
+  const [calendarLoadedAt, setCalendarLoadedAt] = useState(0);
+  const calendarRef = useRef<HTMLIFrameElement>(null);
+
+  // The OnceHub page focuses itself after it loads (sometimes more than once), and the browser then
+  // jumps the parent page down to the calendar. For the first 10 seconds after the calendar mounts,
+  // undo any jump that happens while focus sits in the calendar. A single scroll event that moves
+  // more than 250px is a focus jump, not the visitor scrolling.
+  useEffect(() => {
+    if (!showBooking) return;
+    const until = Date.now() + 10_000 + (calendarLoadedAt ? calendarLoadedAt - Date.now() : 0);
+    let lastY = window.scrollY;
+    const restore = (y: number) => {
+      calendarRef.current?.blur();
+      window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Date.now() < until && document.activeElement === calendarRef.current && Math.abs(y - lastY) > 250) {
+        restore(lastY);
+        return;
+      }
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    const stop = window.setTimeout(() => window.removeEventListener("scroll", onScroll), Math.max(0, until - Date.now()));
+    return () => {
+      window.clearTimeout(stop);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [showBooking, calendarLoadedAt]);
   useEffect(() => {
     const el = bookRef.current;
     if (!el || showBooking) return;
@@ -251,12 +281,16 @@ export default function LandingPageTemplate(props: LandingPageProps) {
             />
           </Reveal>
           <Reveal>
-            <div className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div
+              className="max-w-4xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+            >
               {showBooking ? (
                 <iframe
+                  ref={calendarRef}
                   src={BOOKING_URL}
                   style={{ width: "100%", height: "760px", border: "none" }}
                   title="Schedule a consultation with Brad Filmanowicz"
+                  onLoad={() => setCalendarLoadedAt(Date.now())}
                 />
               ) : (
                 <div style={{ height: "760px" }} aria-hidden="true" />
