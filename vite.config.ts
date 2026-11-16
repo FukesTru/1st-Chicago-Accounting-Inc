@@ -150,10 +150,13 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+// The Manus editor helpers (source-location attributes, the ~360 KB inline editor runtime and the
+// debug log collector) only matter inside the editor's dev server. Keeping them out of production
+// builds removes ~360 KB of inline script from every page, including the Google Ads landing pages.
+const devOnlyPlugins = [jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
 
-export default defineConfig({
-  plugins,
+export default defineConfig(({ command }) => ({
+  plugins: [react(), tailwindcss(), ...(command === "serve" ? devOnlyPlugins : [])],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
@@ -184,4 +187,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));

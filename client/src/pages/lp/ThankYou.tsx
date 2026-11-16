@@ -1,7 +1,8 @@
 /**
  * /thank-you — every landing page form redirects here (set in the GHL form's "on submit").
  * GTM fires the Google Ads "Form lead" conversion on this page view / the generate_lead event.
- * /booked — target for OnceHub's after-booking redirect, once Brad grants OnceHub access.
+ * /booked — target for OnceHub's after-booking redirect (set in OnceHub → Booking page → after booking).
+ *           GTM fires the Google Ads "Consult booked" conversion on the consult_booked event.
  */
 import { useEffect } from "react";
 import { CalendarCheck, CheckCircle2 } from "lucide-react";
@@ -11,8 +12,27 @@ import { BOOKING_URL, COURSE_OFFER, trackEvent } from "@/lib/landing";
 const CYAN = "oklch(0.66 0.16 218)";
 const serif = { fontFamily: "'Playfair Display', serif" };
 
+/**
+ * The OnceHub calendar is embedded in an iframe on the landing pages and /contact, so OnceHub's
+ * after-booking redirect loads /booked *inside that iframe*. Send the whole tab to /booked instead,
+ * so the visitor sees a full confirmation page and the conversion fires exactly once, in the top window.
+ * Returns true when it handed off to the top window (the framed copy then stays quiet).
+ */
+function breakOutOfFrame(): boolean {
+  try {
+    if (window.top && window.top !== window.self && window.top.location.origin === window.location.origin) {
+      window.top.location.href = window.location.pathname + window.location.search;
+      return true;
+    }
+  } catch {
+    // Cross-origin parent (or sandboxed frame): we can't move it, so track from here.
+  }
+  return false;
+}
+
 function ConfirmationPage({ kind }: { kind: "lead" | "booked" }) {
   useEffect(() => {
+    if (kind === "booked" && breakOutOfFrame()) return;
     trackEvent(kind === "lead" ? "generate_lead" : "consult_booked");
   }, [kind]);
 
