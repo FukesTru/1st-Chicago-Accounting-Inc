@@ -64,35 +64,72 @@ function goToCalendar(e: React.MouseEvent, location: string) {
   document.getElementById("book")?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
 }
 
-/** "$35,000" counts up from $0 once `delay` ms have passed. Non-numeric values ("3-to-1") are shown as is. */
+/**
+ * "$35,000" counts up from $0 once `delay` ms have passed. Non-numeric values ("3-to-1") are shown as is.
+ * Why it is built this way (it used to look glitchy on phones):
+ *  - Playfair Display has old-style, proportional digits and no tabular figures, so `tabular-nums`
+ *    did nothing: every frame the digits bobbed up and down (3, 5, 9 drop below the line) and the
+ *    centred number slid left and right. We force lining figures and right-align the counter, so
+ *    the ",000" end stays still and the number grows leftward like an odometer.
+ *  - It counted in steps of 1, so the last digits flickered 60 times a second. Big numbers now
+ *    count in thousands, so only the leading digits roll.
+ *  - Each frame went through a React re-render; the text is now written straight to the DOM.
+ *  - It started at the same moment the box popped in (scale + overshoot) and before the font had
+ *    loaded. It now waits for the font and for the pop to settle, then runs once.
+ */
 function CountUp({ value, delay }: { value: string; delay: number }) {
   const m = value.match(/^(\D*)([\d,]+)(\D*)$/);
   const target = m ? Number(m[2].replace(/,/g, "")) : 0;
-  const [n, setN] = useState(() => (m && !prefersReducedMotion() ? 0 : target));
+  const animate = !!m && target > 0 && !prefersReducedMotion();
+  const numRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    if (!m || prefersReducedMotion()) return;
+    const el = numRef.current;
+    if (!animate || !el || !m) return;
+    const step = target >= 10000 ? 1000 : target >= 1000 ? 10 : 1;
+    const fmt = (n: number) => `${m[1]}${n.toLocaleString("en-US")}${m[3]}`;
     let raf = 0;
-    const DURATION = 1300;
-    const startAt = performance.now() + delay;
-    const tick = (now: number) => {
-      const t = Math.min(1, Math.max(0, (now - startAt) / DURATION));
-      setN(Math.round(target * (1 - Math.pow(1 - t, 3))));
-      if (t < 1) raf = requestAnimationFrame(tick);
+    let timer = 0;
+    let cancelled = false;
+    let last = -1;
+    const DURATION = 1600;
+    const run = () => {
+      let startAt = 0;
+      const tick = (now: number) => {
+        if (!startAt) startAt = now;
+        const t = Math.min(1, (now - startAt) / DURATION);
+        const eased = 1 - Math.pow(1 - t, 4);
+        const n = t >= 1 ? target : Math.floor((target * eased) / step) * step;
+        if (n !== last) {
+          el.textContent = fmt(n);
+          last = n;
+        }
+        if (t < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const t0 = performance.now();
+    const fontsReady = document.fonts?.ready ?? Promise.resolve();
+    fontsReady.then(() => {
+      if (cancelled) return;
+      // start after the box's pop-in (650ms) has mostly settled
+      const wait = Math.max(0, delay + 350 - (performance.now() - t0));
+      timer = window.setTimeout(run, wait);
+    });
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target, delay]);
+  }, [animate, target, delay]);
   if (!m) return <>{value}</>;
   // The final value is laid out invisibly to reserve the exact width, and the counting number sits
-  // on top of it, so the box never changes size (no jumping or re-wrapping on phones).
+  // on top of it (right-aligned), so the box never changes size and the end digits never move.
   return (
-    <span className="relative inline-block whitespace-nowrap" aria-label={value}>
+    <span className="relative inline-block whitespace-nowrap" style={{ fontVariantNumeric: "lining-nums" }} aria-label={value}>
       <span className="invisible" aria-hidden="true">{value}</span>
-      <span className="absolute inset-0 text-center" aria-hidden="true">
-        {m[1]}
-        {n.toLocaleString("en-US")}
-        {m[3]}
+      <span ref={numRef} className="absolute inset-y-0 right-0 text-right" aria-hidden="true">
+        {animate ? `${m[1]}0${m[3]}` : value}
       </span>
     </span>
   );
