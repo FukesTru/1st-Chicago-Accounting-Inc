@@ -228,7 +228,7 @@ export default function BookingFirstTemplate(props: BookingFirstProps) {
   }, [showBooking, calendarLoadedAt]);
 
   return (
-    <LandingLayout pageTitle={props.pageTitle} hideHeader introFast bookHref="#book">
+    <LandingLayout pageTitle={props.pageTitle} hideHeader introFast introLight bookHref="#book">
       {/* ════════ ZONE 1 · DARK: hero flowing into the calendar ════════ */}
       <div
         className="relative overflow-hidden text-white"

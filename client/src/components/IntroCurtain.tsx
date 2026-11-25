@@ -24,8 +24,8 @@ export function introWillPlay(): boolean {
   return true;
 }
 
-/** fast: ~1 s total instead of ~1.35 s (booking-first tax page). */
-export default function IntroCurtain({ fast = false }: { fast?: boolean }) {
+/** fast: ~1 s total instead of ~1.35 s. light: white curtain with the full-colour logo (booking-first tax page). */
+export default function IntroCurtain({ fast = false, light = false }: { fast?: boolean; light?: boolean }) {
   const logoMs = fast ? 520 : LOGO_MS;
   const liftMs = fast ? 480 : LIFT_MS;
   const [phase, setPhase] = useState<"logo" | "lift" | "done">(() => (introWillPlay() ? "logo" : "done"));
@@ -70,7 +70,7 @@ export default function IntroCurtain({ fast = false }: { fast?: boolean }) {
 
   return (
     <div
-      className={`lp-curtain${phase === "lift" ? " lp-curtain--lift" : ""}`}
+      className={`lp-curtain${light ? " lp-curtain--light" : ""}${phase === "lift" ? " lp-curtain--lift" : ""}`}
       style={phase === "lift" ? { animationDuration: `${liftMs}ms` } : undefined}
       aria-hidden="true"
     >

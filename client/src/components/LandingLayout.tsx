@@ -19,6 +19,8 @@ interface LandingLayoutProps {
   hideHeader?: boolean;
   /** Shorter (~1 s) intro curtain. */
   introFast?: boolean;
+  /** White intro curtain with the full-colour logo. */
+  introLight?: boolean;
   /** Where the sticky mobile "Free consult" button jumps to (default: the form). */
   bookHref?: string;
 }
@@ -41,6 +43,7 @@ export default function LandingLayout({
   hideMobileBar,
   intro = true,
   introFast,
+  introLight,
   hideHeader,
   bookHref = "#get-started",
 }: LandingLayoutProps) {
@@ -48,7 +51,7 @@ export default function LandingLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {intro && <IntroCurtain fast={introFast} />}
+      {intro && <IntroCurtain fast={introFast} light={introLight} />}
       {!hideHeader && (
       <header className="bg-white border-b border-gray-100">
         <div className="container">
