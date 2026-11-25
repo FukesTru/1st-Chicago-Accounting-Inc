@@ -84,12 +84,17 @@ function CountUp({ value, delay }: { value: string; delay: number }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target, delay]);
   if (!m) return <>{value}</>;
+  // The final value is laid out invisibly to reserve the exact width, and the counting number sits
+  // on top of it, so the box never changes size (no jumping or re-wrapping on phones).
   return (
-    <>
-      {m[1]}
-      {n.toLocaleString("en-US")}
-      {m[3]}
-    </>
+    <span className="relative inline-block whitespace-nowrap" aria-label={value}>
+      <span className="invisible" aria-hidden="true">{value}</span>
+      <span className="absolute inset-0 text-center" aria-hidden="true">
+        {m[1]}
+        {n.toLocaleString("en-US")}
+        {m[3]}
+      </span>
+    </span>
   );
 }
 
