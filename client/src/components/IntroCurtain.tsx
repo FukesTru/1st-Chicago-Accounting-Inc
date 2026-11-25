@@ -13,7 +13,7 @@ const LOGO_MS = 750; // logo in + hold
 const LIFT_MS = 600;
 const SCROLL_KEYS = new Set(["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " ", "Spacebar"]);
 
-function shouldPlay(): boolean {
+export function introWillPlay(): boolean {
   if (typeof window === "undefined") return false;
   try {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
@@ -24,8 +24,11 @@ function shouldPlay(): boolean {
   return true;
 }
 
-export default function IntroCurtain() {
-  const [phase, setPhase] = useState<"logo" | "lift" | "done">(() => (shouldPlay() ? "logo" : "done"));
+/** fast: ~1 s total instead of ~1.35 s (booking-first tax page). */
+export default function IntroCurtain({ fast = false }: { fast?: boolean }) {
+  const logoMs = fast ? 520 : LOGO_MS;
+  const liftMs = fast ? 480 : LIFT_MS;
+  const [phase, setPhase] = useState<"logo" | "lift" | "done">(() => (introWillPlay() ? "logo" : "done"));
 
   useEffect(() => {
     if (phase !== "logo") return;
@@ -53,8 +56,8 @@ export default function IntroCurtain() {
     const lift = window.setTimeout(() => {
       unlock();
       setPhase("lift");
-    }, LOGO_MS);
-    const done = window.setTimeout(() => setPhase("done"), LOGO_MS + LIFT_MS);
+    }, logoMs);
+    const done = window.setTimeout(() => setPhase("done"), logoMs + liftMs);
     return () => {
       unlock();
       window.clearTimeout(lift);
@@ -66,7 +69,11 @@ export default function IntroCurtain() {
   if (phase === "done") return null;
 
   return (
-    <div className={`lp-curtain${phase === "lift" ? " lp-curtain--lift" : ""}`} aria-hidden="true">
+    <div
+      className={`lp-curtain${phase === "lift" ? " lp-curtain--lift" : ""}`}
+      style={phase === "lift" ? { animationDuration: `${liftMs}ms` } : undefined}
+      aria-hidden="true"
+    >
       <img
         src="/manus-storage/logo_transparent_156fdccb.png"
         alt=""

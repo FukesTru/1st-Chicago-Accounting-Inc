@@ -27,7 +27,8 @@ export default function TaxPlanningLP() {
           highlight: true,
         },
       ]}
-      calendarPush="Book your time now. Only 4 spots left this year."
+      calendarPush={{ lead: "Book your time now.", highlight: "Only 4 spots left this year." }}
+      ctaButton="Book a time with Brad now"
       footnote="Savings depend on your income, business and situation. Your free consultation shows what applies to you."
       steps={[
         {
@@ -46,7 +47,7 @@ export default function TaxPlanningLP() {
       ]}
       finalHeadline="Ready to find your $30,000?"
       finalSubtext="Give Brad 15 minutes. Typical first-year savings are $35,000, and if your plan doesn't return 3-to-1 on what it costs, it's free."
-      finalButton="Book my free 15 minutes"
+      finalButton="Book a time with Brad now"
     />
   );
 }

@@ -17,6 +17,8 @@ interface LandingLayoutProps {
   intro?: boolean;
   /** Hide the white logo + phone header (the booking-first tax page opens straight on navy). */
   hideHeader?: boolean;
+  /** Shorter (~1 s) intro curtain. */
+  introFast?: boolean;
   /** Where the sticky mobile "Free consult" button jumps to (default: the form). */
   bookHref?: string;
 }
@@ -38,6 +40,7 @@ export default function LandingLayout({
   pageTitle,
   hideMobileBar,
   intro = true,
+  introFast,
   hideHeader,
   bookHref = "#get-started",
 }: LandingLayoutProps) {
@@ -45,7 +48,7 @@ export default function LandingLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {intro && <IntroCurtain />}
+      {intro && <IntroCurtain fast={introFast} />}
       {!hideHeader && (
       <header className="bg-white border-b border-gray-100">
         <div className="container">

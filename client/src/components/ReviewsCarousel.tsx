@@ -58,7 +58,7 @@ function ReviewCard({ r, expanded, onToggle }: { r: GoogleReview; expanded: bool
   const long = words.length > CLAMP_WORDS;
   const shown = long && !expanded ? `${words.slice(0, CLAMP_WORDS).join(" ")}…` : r.text;
   return (
-    <figure className="h-full flex flex-col bg-white rounded-xl p-6 shadow-lg">
+    <figure className="h-full flex flex-col bg-white rounded-xl p-6 shadow-lg ring-1 ring-black/5">
       <Stars />
       <blockquote className="text-gray-700 leading-relaxed mt-3 flex-1">“{shown}”</blockquote>
       {long && (
@@ -82,7 +82,8 @@ function ReviewCard({ r, expanded, onToggle }: { r: GoogleReview; expanded: bool
   );
 }
 
-export default function ReviewsCarousel() {
+/** light: cream background with dark text (booking-first tax page); default is the navy band. */
+export default function ReviewsCarousel({ light = false }: { light?: boolean } = {}) {
   const perPage = usePerPage();
   const pages = Math.max(1, Math.ceil(GOOGLE_REVIEWS.length / perPage));
   const [page, setPage] = useState(0);
@@ -126,24 +127,30 @@ export default function ReviewsCarousel() {
   const stars = GOOGLE_RATING?.stars ?? "5.0";
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden" style={{ backgroundColor: NAVY }} aria-labelledby="reviews-heading">
-      <div
-        className="absolute inset-0 opacity-15 pointer-events-none"
-        style={{ backgroundImage: `radial-gradient(ellipse at 85% 15%, ${CYAN}, transparent 55%)` }}
-      />
+    <section
+      className="relative py-16 md:py-24 overflow-hidden"
+      style={{ backgroundColor: light ? "transparent" : NAVY }}
+      aria-labelledby="reviews-heading"
+    >
+      {!light && (
+        <div
+          className="absolute inset-0 opacity-15 pointer-events-none"
+          style={{ backgroundImage: `radial-gradient(ellipse at 85% 15%, ${CYAN}, transparent 55%)` }}
+        />
+      )}
       <div className="container relative z-10">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-10 md:mb-12">
             <div>
               <p className="section-label mb-3" style={{ color: CYAN }}>Client reviews</p>
-              <h2 id="reviews-heading" className="text-white text-3xl md:text-4xl font-bold leading-tight" style={serif}>
+              <h2 id="reviews-heading" className={`${light ? "text-gray-900" : "text-white"} text-3xl md:text-4xl font-bold leading-tight`} style={serif}>
                 What Brad's clients say
               </h2>
               <div className="flex items-center gap-4 mt-5">
-                <span className="text-white text-5xl md:text-6xl font-bold leading-none" style={serif}>{stars}</span>
+                <span className={`${light ? "text-gray-900" : "text-white"} text-5xl md:text-6xl font-bold leading-none`} style={serif}>{stars}</span>
                 <div>
                   <Stars size={20} />
-                  <p className="flex items-center gap-1.5 text-white/75 text-sm mt-1.5">
+                  <p className={`flex items-center gap-1.5 ${light ? "text-gray-600" : "text-white/75"} text-sm mt-1.5`}>
                     <GoogleG size={16} /> Based on {count} Google reviews
                   </p>
                 </div>
@@ -153,7 +160,7 @@ export default function ReviewsCarousel() {
               href={GOOGLE_LISTING_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-outline-white px-6 py-3 self-start md:self-auto"
+              className={`${light ? "btn-outline-cyan" : "btn-outline-white"} px-6 py-3 self-start md:self-auto`}
               onClick={() => trackEvent("google_reviews_click", { click_location: "reviews" })}
             >
               Read all {count} on Google
@@ -183,7 +190,7 @@ export default function ReviewsCarousel() {
                   type="button"
                   onClick={() => go(-1)}
                   aria-label="Previous reviews"
-                  className="inline-grid place-items-center w-11 h-11 rounded-full border border-white/30 text-white hover:bg-white/10 transition-colors"
+                  className={`inline-grid place-items-center w-11 h-11 rounded-full border transition-colors ${light ? "border-gray-300 text-gray-700 hover:bg-gray-100" : "border-white/30 text-white hover:bg-white/10"}`}
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -191,7 +198,7 @@ export default function ReviewsCarousel() {
                   type="button"
                   onClick={() => go(1)}
                   aria-label="Next reviews"
-                  className="inline-grid place-items-center w-11 h-11 rounded-full border border-white/30 text-white hover:bg-white/10 transition-colors"
+                  className={`inline-grid place-items-center w-11 h-11 rounded-full border transition-colors ${light ? "border-gray-300 text-gray-700 hover:bg-gray-100" : "border-white/30 text-white hover:bg-white/10"}`}
                 >
                   <ChevronRight size={20} />
                 </button>
@@ -206,12 +213,12 @@ export default function ReviewsCarousel() {
                       aria-label={`Go to reviews page ${i + 1}`}
                       aria-current={i === page ? "true" : undefined}
                       className="w-2.5 h-2.5 rounded-full transition-colors"
-                      style={{ backgroundColor: i === page ? CYAN : "rgba(255,255,255,0.3)" }}
+                      style={{ backgroundColor: i === page ? CYAN : light ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.3)" }}
                     />
                   ))}
                 </div>
               ) : (
-                <p className="text-white/60 text-sm tabular-nums">
+                <p className={`${light ? "text-gray-500" : "text-white/60"} text-sm tabular-nums`}>
                   {page + 1} / {pages}
                 </p>
               )}
