@@ -15,6 +15,14 @@ interface LandingLayoutProps {
   hideMobileBar?: boolean;
   /** Play the one-time navy intro curtain (off on confirmation pages). */
   intro?: boolean;
+  /** Hide the white logo + phone header (the booking-first tax page opens straight on navy). */
+  hideHeader?: boolean;
+  /** Shorter (~1 s) intro curtain. */
+  introFast?: boolean;
+  /** White intro curtain with the full-colour logo. */
+  introLight?: boolean;
+  /** Where the sticky mobile "Free consult" button jumps to (default: the form). */
+  bookHref?: string;
 }
 
 export function PhoneLink({ className, label, location }: { className?: string; label?: string; location: string }) {
@@ -29,12 +37,22 @@ export function PhoneLink({ className, label, location }: { className?: string; 
   );
 }
 
-export default function LandingLayout({ children, pageTitle, hideMobileBar, intro = true }: LandingLayoutProps) {
+export default function LandingLayout({
+  children,
+  pageTitle,
+  hideMobileBar,
+  intro = true,
+  introFast,
+  introLight,
+  hideHeader,
+  bookHref = "#get-started",
+}: LandingLayoutProps) {
   useEffect(() => setNoIndex(pageTitle), [pageTitle]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {intro && <IntroCurtain />}
+      {intro && <IntroCurtain fast={introFast} light={introLight} />}
+      {!hideHeader && (
       <header className="bg-white border-b border-gray-100">
         <div className="container">
           <div className="flex items-center justify-between h-16 md:h-20">
@@ -58,6 +76,7 @@ export default function LandingLayout({ children, pageTitle, hideMobileBar, intr
           </div>
         </div>
       </header>
+      )}
 
       <main className={`flex-1 ${hideMobileBar ? "" : "pb-20 md:pb-0"}`}>{children}</main>
 
@@ -80,7 +99,7 @@ export default function LandingLayout({ children, pageTitle, hideMobileBar, intr
             label="Call Brad"
           />
           <a
-            href="#get-started"
+            href={bookHref}
             className="flex items-center justify-center gap-2 py-4 text-white font-semibold"
             style={{ backgroundColor: "oklch(0.66 0.16 218)" }}
           >
