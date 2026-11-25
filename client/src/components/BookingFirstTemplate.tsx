@@ -129,7 +129,7 @@ function LeadDown() {
 export default function BookingFirstTemplate(props: BookingFirstProps) {
   const { key, eyebrow } = useMemo(() => pickEyebrow(props.eyebrows), [props.eyebrows]);
   // Start the hero animations after the curtain lifts (it plays once per visit).
-  const [base] = useState(() => (introWillPlay() ? 950 : 120));
+  const [base] = useState(() => (introWillPlay() ? 650 : 120));
   const words = props.headline.split(" ");
   const afterHeadline = base + words.length * 70 + 200;
   const at = (ms: number) => ({ ["--d" as string]: `${ms}ms` }) as React.CSSProperties;

@@ -56,8 +56,39 @@
       "priceRange": "$$"
     }
     </script>
+    <!-- Tax planning ad page: paint the white logo intro instantly, before the app's JavaScript loads
+         (the React IntroCurtain takes over the same screen). Same once-per-session rule as IntroCurtain. -->
+    <script>
+      (function () {
+        try {
+          if (!/^\/lp\/tax-planning\/?$/.test(location.pathname)) return;
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          if (sessionStorage.getItem("lp_intro_seen")) return;
+        } catch (e) {}
+        document.documentElement.className += " lp-boot";
+        var l = document.createElement("link");
+        l.rel = "preload";
+        l.as = "image";
+        l.href = "/manus-storage/logo_transparent_156fdccb.png";
+        document.head.appendChild(l);
+      })();
+    </script>
+    <style>
+      #lp-boot { display: none; }
+      .lp-boot body { background: #fff; }
+      .lp-boot #lp-boot {
+        position: fixed; inset: 0; z-index: 99; display: grid; place-items: center;
+        background: radial-gradient(ellipse at 50% 55%, rgba(14, 165, 233, 0.10), transparent 60%), #fff;
+      }
+      #lp-boot img { width: min(250px, 56vw); height: auto; }
+    </style>
   </head>
   <body>
+    <script>
+      if (document.documentElement.className.indexOf("lp-boot") > -1) {
+        document.write('<div id="lp-boot" aria-hidden="true"><img src="/manus-storage/logo_transparent_156fdccb.png" alt="" width="516" height="211"></div>');
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- LeadConnector Chat Widget (not on the Google Ads landing pages, /thank-you or /booked) -->

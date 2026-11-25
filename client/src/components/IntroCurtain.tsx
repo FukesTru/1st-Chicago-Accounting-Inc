@@ -29,6 +29,13 @@ export default function IntroCurtain({ fast = false, light = false }: { fast?: b
   const logoMs = fast ? 520 : LOGO_MS;
   const liftMs = fast ? 480 : LIFT_MS;
   const [phase, setPhase] = useState<"logo" | "lift" | "done">(() => (introWillPlay() ? "logo" : "done"));
+  // index.html may already be showing the same white logo screen (#lp-boot) while the app loaded.
+  // If so, the logo is already in place: skip its rise-in, then remove the static copy.
+  const [booted] = useState(() => typeof document !== "undefined" && !!document.getElementById("lp-boot"));
+  useEffect(() => {
+    document.getElementById("lp-boot")?.remove();
+    document.documentElement.classList.remove("lp-boot");
+  }, []);
 
   useEffect(() => {
     if (phase !== "logo") return;
@@ -70,7 +77,7 @@ export default function IntroCurtain({ fast = false, light = false }: { fast?: b
 
   return (
     <div
-      className={`lp-curtain${light ? " lp-curtain--light" : ""}${phase === "lift" ? " lp-curtain--lift" : ""}`}
+      className={`lp-curtain${light ? " lp-curtain--light" : ""}${booted ? " lp-curtain--booted" : ""}${phase === "lift" ? " lp-curtain--lift" : ""}`}
       style={phase === "lift" ? { animationDuration: `${liftMs}ms` } : undefined}
       aria-hidden="true"
     >
