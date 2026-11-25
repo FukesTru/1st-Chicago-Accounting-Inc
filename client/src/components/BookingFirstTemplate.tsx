@@ -452,13 +452,12 @@ export default function BookingFirstTemplate(props: BookingFirstProps) {
         <div aria-hidden="true" className="lp-aurora lp-aurora--low pointer-events-none absolute inset-0" />
         <section id="get-started" className="relative z-10 pt-16 pb-12 md:pt-24 md:pb-16 scroll-mt-2">
           <div className="container max-w-xl">
-            <Reveal>
               <div className="bg-white rounded-2xl shadow-2xl p-5 md:p-7 ring-1 ring-white/10">
                 <h2 className="text-2xl font-bold text-gray-900 mb-1 text-center" style={serif}>Rather Brad call you?</h2>
                 <p className="text-sm text-gray-500 mb-4 text-center">Leave your number and Brad will call you back.</p>
                 <iframe
                   src={`https://api.leadconnectorhq.com/widget/form/${LP_FORM_ID}`}
-                  style={{ width: "100%", height: "480px", border: "none", borderRadius: "8px" }}
+                  style={{ width: "100%", height: "620px", border: "none", borderRadius: "8px" }}
                   id={`inline-${LP_FORM_ID}`}
                   data-layout="{'id':'INLINE'}"
                   data-trigger-type="alwaysShow"
@@ -468,14 +467,12 @@ export default function BookingFirstTemplate(props: BookingFirstProps) {
                   data-deactivation-type="neverDeactivate"
                   data-deactivation-value=""
                   data-form-name={LP_FORM_NAME}
-                  data-height="480"
+                  data-height="542"
                   data-layout-iframe-id={`inline-${LP_FORM_ID}`}
                   data-form-id={LP_FORM_ID}
                   title={LP_FORM_NAME}
-                  loading="lazy"
                 />
               </div>
-            </Reveal>
           </div>
         </section>
 
